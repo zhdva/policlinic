@@ -15,7 +15,8 @@ public class MainUI extends UI {
             final VerticalLayout vLayout = new VerticalLayout();
             vLayout.setMargin(true);
             setContent(vLayout);
-            TopPanel.getMenu(vLayout);
+
+            TopPanel tp = new TopPanel(vLayout);
 
         }
 

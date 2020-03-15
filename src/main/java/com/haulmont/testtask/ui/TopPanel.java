@@ -1,5 +1,8 @@
 package com.haulmont.testtask.ui;
 
+import com.haulmont.testtask.model.Doctor;
+import com.haulmont.testtask.model.Patient;
+import com.haulmont.testtask.model.Prescription;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -7,25 +10,27 @@ import com.vaadin.ui.Layout;
 
 public class TopPanel {
 
-    private boolean gridAdded = false;
+    private Grid currentGrid;
 
-    public static void getMenu(Layout parentLayout) {
+    public TopPanel(Layout parentLayout) {
 
         final HorizontalLayout hLayout = new HorizontalLayout();
         hLayout.setMargin(true);
-        //setContent(hLayout);
         parentLayout.addComponent(hLayout);
 
         Button buttonPatients = new Button("Пациенты");
-        addButtonClickListener(buttonPatients, parentLayout, PatientsGrid.getGrid());
+        BaseGrid<Patient> patientsGrid = new PatientsGrid();
+        addButtonClickListener(buttonPatients, parentLayout, patientsGrid.getGrid());
         hLayout.addComponent(buttonPatients);
 
         Button buttonDoctors = new Button("Врачи");
-        //addButtonClickListener(buttonDoctors, parentLayout, DoctorsGrid.getGrid());
+        BaseGrid<Doctor> doctorsGrid = new DoctorsGrid();
+        addButtonClickListener(buttonDoctors, parentLayout, doctorsGrid.getGrid());
         hLayout.addComponent(buttonDoctors);
 
         Button buttonPrescriptions = new Button("Рецепты");
-        //addButtonClickListener(buttonPrescriptions, parentLayout, PrescriptionsGrid.getGrid());
+        BaseGrid<Prescription> prescriptionGrid = new PrescriptionsGrid();
+        addButtonClickListener(buttonPrescriptions, parentLayout, prescriptionGrid.getGrid());
         hLayout.addComponent(buttonPrescriptions);
 
     }
@@ -35,18 +40,18 @@ public class TopPanel {
         button.addClickListener(new Button.ClickListener() {
 
             @Override
-            public void buttonClick(ClickEvent event) {
+            public void buttonClick(Button.ClickEvent event) {
 
-                //if (gridAdded) {
-                //    parentLayout.replaceComponent(oldGrid, newGrid);
-                //} else {
+                if (currentGrid != null) {
+                    parentLayout.replaceComponent(currentGrid, newGrid);
+                } else {
                     parentLayout.addComponent(newGrid);
-                    gridAdded = true;
-                //}
+                }
+
+                currentGrid = newGrid;
 
             }
         });
     }
-
 
 }
