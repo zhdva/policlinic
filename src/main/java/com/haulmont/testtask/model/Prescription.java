@@ -2,28 +2,14 @@ package com.haulmont.testtask.model;
 
 import java.util.Date;
 
-public class Prescription {
+public class Prescription extends BaseModel {
 
     private String description;
     private String patient;
     private String doctor;
     private Date dateCreate;
-    private String validity;
+    private Date validity;
     private String priority;
-
-    public Prescription(String description,
-                        String patient,
-                        String doctor,
-                        Date dateCreate,
-                        String validity,
-                        String priority) {
-        this.description = description;
-        this.patient = patient;
-        this.doctor = doctor;
-        this.dateCreate = dateCreate;
-        this.validity = validity;
-        this.priority = priority;
-    }
 
     public String getDescription() {
         return description;
@@ -41,7 +27,7 @@ public class Prescription {
         return dateCreate;
     }
 
-    public String getValidity() {
+    public Date getValidity() {
         return validity;
     }
 
@@ -65,7 +51,7 @@ public class Prescription {
         this.dateCreate = dateCreate;
     }
 
-    public void setValidity(final String validity) {
+    public void setValidity(final Date validity) {
         this.validity = validity;
     }
 

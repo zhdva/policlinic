@@ -1,18 +1,11 @@
 package com.haulmont.testtask.model;
 
-public class Doctor {
+public class Doctor extends BaseModel {
 
     private String name;
     private String surname;
     private String patronymic;
     private String specialization;
-
-    public Doctor(String name, String surname, String patronymic, String specialization) {
-        this.name = name;
-        this.surname = surname;
-        this.patronymic = patronymic;
-        this.specialization = specialization;
-    }
 
     public String getName() {
         return name;
