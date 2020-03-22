@@ -1,5 +1,6 @@
 package com.haulmont.testtask.ui;
 
+import com.haulmont.testtask.dao.IController;
 import com.haulmont.testtask.dao.PatientController;
 import com.haulmont.testtask.model.Patient;
 import com.vaadin.data.Binder;
@@ -12,50 +13,18 @@ import java.sql.SQLException;
 public class PatientsGrid extends BaseGrid<Patient> {
 
     public PatientsGrid() throws SQLException {
+        controller = new PatientController();
         configGrid();
         setGrid();
-        getPatientsGrid();
+        getButtons("Добавить пациента", "Редактирование пациента", "300");
+        buttonsAndGrid.addComponents(new Label("Список пациентов"), buttons, grid);
     }
 
-    private void getPatientsGrid() {
-
-        Button addPatient = new Button("Добавить");
-        addPatient.addClickListener(event -> {
-            Window addWindow = getWindow("Добавить пациента");
-            addWindow.setWidth("300");
-            FormLayout addForm = getForm(false, addWindow);
-            addWindow.setContent(addForm);
-            UI.getCurrent().addWindow(addWindow);
-            });
-
-        Button editPatient = new Button("Изменить");
-        editPatient.addClickListener(event -> {
-            if (selectedItem != null) {
-                Window editWindow = getWindow("Редактирование пациента");
-                editWindow.setWidth("300");
-                FormLayout editForm = getForm(true, editWindow);
-                editWindow.setContent(editForm);
-                UI.getCurrent().addWindow(editWindow);
-            }
-        });
-
-        Button removePatient = removeButton(new PatientController());
-
-        buttons.addComponent(addPatient);
-        buttons.addComponent(editPatient);
-        buttons.addComponent(removePatient);
-
-        buttonsAndGrid.addComponent(new Label("Список пациентов"));
-        buttonsAndGrid.addComponent(buttons);
-        buttonsAndGrid.addComponent(grid);
-
-    }
-
-    private FormLayout getForm(final boolean edit, final Window window) {
+    @Override
+    protected FormLayout getForm(final boolean edit, final Window window) {
 
         FormLayout form = new FormLayout();
         Binder<Patient> binder = new Binder<>();
-        controller = new PatientController();
 
         TextField surname = new TextField("Фамилия");
         binder.forField(surname)
@@ -131,10 +100,10 @@ public class PatientsGrid extends BaseGrid<Patient> {
     }
 
     private void setGrid() throws SQLException {
-        grid.addColumn(Patient::getSurname).setCaption("Фамилия").setWidth(size);
-        grid.addColumn(Patient::getName).setCaption("Имя").setWidth(size);
-        grid.addColumn(Patient::getPatronymic).setCaption("Отчество").setWidth(size);
-        grid.addColumn(Patient::getPhone).setCaption("Телефон").setWidth(size);
+        grid.addColumn(Patient::getSurname).setCaption("Фамилия").setWidth(200);
+        grid.addColumn(Patient::getName).setCaption("Имя").setWidth(200);
+        grid.addColumn(Patient::getPatronymic).setCaption("Отчество").setWidth(200);
+        grid.addColumn(Patient::getPhone).setCaption("Телефон").setWidth(200);
         grid.setItems(new PatientController().getAll());
         grid.setWidth("800");
     }

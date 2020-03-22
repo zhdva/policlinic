@@ -1,61 +1,36 @@
 package com.haulmont.testtask.ui;
 
 import com.haulmont.testtask.dao.DoctorController;
+import com.haulmont.testtask.dao.IController;
+import com.haulmont.testtask.dao.PrescriptionController;
 import com.haulmont.testtask.model.Doctor;
+import com.haulmont.testtask.model.Prescription;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationException;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DoctorsGrid extends BaseGrid<Doctor> {
 
     public DoctorsGrid() throws SQLException {
+        controller = new DoctorController();
         configGrid();
         setGrid();
-        getDoctorsGrid();
+        getButtons("Добавить врача", "Редактирование врача", "330");
+        //addStatisticsButton();
+        buttonsAndGrid.addComponents(new Label("Список пациентов"), buttons, grid);
     }
 
-    private void getDoctorsGrid() {
-
-        Button addDoctor = new Button("Добавить");
-        addDoctor.addClickListener(event -> {
-            Window addWindow = getWindow("Добавить врача");
-            addWindow.setWidth("350");
-            FormLayout addForm = getForm(false, addWindow);
-            addWindow.setContent(addForm);
-            UI.getCurrent().addWindow(addWindow);
-        });
-
-        Button editDoctor = new Button("Изменить");
-        editDoctor.addClickListener(event -> {
-            if (selectedItem != null) {
-                Window editWindow = getWindow("Редактирование врача");
-                editWindow.setWidth("350");
-                FormLayout editForm = getForm(true, editWindow);
-                editWindow.setContent(editForm);
-                UI.getCurrent().addWindow(editWindow);
-            }
-        });
-
-        Button removeDoctor = removeButton(new DoctorController());
-
-        buttons.addComponent(addDoctor);
-        buttons.addComponent(editDoctor);
-        buttons.addComponent(removeDoctor);
-
-        buttonsAndGrid.addComponent(new Label("Список врачей"));
-        buttonsAndGrid.addComponent(buttons);
-        buttonsAndGrid.addComponent(grid);
-
-    }
-
-    private FormLayout getForm(final boolean edit, final Window window) {
+    @Override
+    protected FormLayout getForm(final boolean edit, final Window window) {
 
         FormLayout form = new FormLayout();
         Binder<Doctor> binder = new Binder<>();
-        controller = new DoctorController();
 
         TextField surname = new TextField("Фамилия");
         binder.forField(surname)
@@ -131,12 +106,52 @@ public class DoctorsGrid extends BaseGrid<Doctor> {
     }
 
     private void setGrid() throws SQLException {
-        grid.addColumn(Doctor::getSurname).setCaption("Фамилия").setWidth(size);
-        grid.addColumn(Doctor::getName).setCaption("Имя").setWidth(size);
-        grid.addColumn(Doctor::getPatronymic).setCaption("Отчество").setWidth(size);
-        grid.addColumn(Doctor::getSpecialization).setCaption("Специализация").setWidth(size);
+        grid.addColumn(Doctor::getSurname).setCaption("Фамилия").setWidth(200);
+        grid.addColumn(Doctor::getName).setCaption("Имя").setWidth(200);
+        grid.addColumn(Doctor::getPatronymic).setCaption("Отчество").setWidth(200);
+        grid.addColumn(Doctor::getSpecialization).setCaption("Специализация").setWidth(200);
         grid.setItems(new DoctorController().getAll());
         grid.setWidth("800");
     }
+
+    /*private void addStatisticsButton() {
+
+        Grid statisticsGrid = new Grid();
+        grid.addColumn().setCaption("Врач").setWidth(200);
+        grid.addColumn().setCaption("Кол. рецептов").setWidth(100);
+
+        Button statisticsButton = new Button("Показать статистику");
+        statisticsButton.addClickListener(event -> {
+            Window statisticsWindow = new Window("Статистика", statisticsGrid);
+            statisticsWindow.center();
+            statisticsWindow.setDraggable(false);
+            statisticsWindow.setResizable(false);
+            //window.setModal(true);
+            UI.getCurrent().addWindow(statisticsWindow);
+        });
+    }
+
+    public List<String> doctorsList() throws SQLException {
+
+        List<Doctor> doctors = controller.getAll();
+        List<String> doctorsList = new ArrayList<>();
+        Map<String, int> stat = new HashMap<>();
+
+        for (Doctor d: doctors) {
+
+            String surname = d.getSurname();
+            String name = d.getName();
+            String patronymic = d.getPatronymic();
+            String specialization = d.getSpecialization();
+
+            String doctor = surname + " " + name.charAt(0) + ". " + patronymic.charAt(0) + ". (" + specialization + ")";
+            doctorsList.add(doctor);
+
+        }
+
+
+        return doctorsList;
+
+    }*/
 
 }
