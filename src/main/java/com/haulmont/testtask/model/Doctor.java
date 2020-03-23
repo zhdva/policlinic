@@ -38,4 +38,9 @@ public class Doctor extends BaseModel {
     public void setSpecialization(String specialization) {
         this.specialization = specialization;
     }
+
+    @Override
+    public String toString() {
+        return surname + " " + name.charAt(0) + ". " + patronymic.charAt(0) + ". (" + specialization + ")";
+    }
 }

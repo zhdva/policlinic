@@ -39,4 +39,9 @@ public class Patient extends BaseModel {
         this.phone = phone;
     }
 
+    @Override
+    public String toString() {
+        return surname + " " + name.charAt(0) + ". " + patronymic.charAt(0) + ".";
+    }
+
 }
