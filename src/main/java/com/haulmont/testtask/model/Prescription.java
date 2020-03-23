@@ -5,9 +5,9 @@ import java.util.Date;
 public class Prescription extends BaseModel {
 
     private String description;
-    private String patient;
-    private String doctor;
-    private Date dateCreate;
+    private Patient patient;
+    private Doctor doctor;
+    private Date created;
     private Date validity;
     private String priority;
 
@@ -15,16 +15,16 @@ public class Prescription extends BaseModel {
         return description;
     }
 
-    public String getPatient() {
+    public Patient getPatient() {
         return patient;
     }
 
-    public String getDoctor() {
+    public Doctor getDoctor() {
         return doctor;
     }
 
-    public Date getDateCreate() {
-        return dateCreate;
+    public Date getCreated() {
+        return created;
     }
 
     public Date getValidity() {
@@ -39,29 +39,24 @@ public class Prescription extends BaseModel {
         this.description = description;
     }
 
-    public void setPatient(final String patient) {
+    public void setPatient(final Patient patient) {
         this.patient = patient;
     }
 
-    public void setDoctor(final String doctor) {
+    public void setDoctor(final Doctor doctor) {
         this.doctor = doctor;
     }
 
-    public void setDateCreate(final Date dateCreate) {
-        this.dateCreate = dateCreate;
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
     public void setValidity(final Date validity) {
         this.validity = validity;
     }
 
-    public void setPriority(final String priority) {
-        this.priority = priority;
-    }
-
-
-    private enum Priority {
-        normal, cito, statim;
+    public void setPriority(final PrescriptionPriority priority) {
+        this.priority = priority.toString();
     }
 
 }
