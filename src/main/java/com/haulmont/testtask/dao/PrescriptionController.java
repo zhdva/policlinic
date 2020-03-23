@@ -27,7 +27,7 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
             ps.setLong(3, prescription.getDoctor().getId());
             ps.setDate(4, Date.valueOf(prescription.getCreated()));
             ps.setDate(5, Date.valueOf(prescription.getValidity()));
-            ps.setString(6, prescription.getPriority().toString());
+            ps.setString(6, prescription.getPriority());
 
             ps.executeUpdate();
 
