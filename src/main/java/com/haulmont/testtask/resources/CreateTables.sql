@@ -7,7 +7,7 @@ CREATE TABLE patients (
     surname varchar(50) NOT NULL,
     name varchar(50) NOT NULL,
     patronymic varchar(50) NOT NULL,
-    phone varchar(11) NOT NULL
+    phone varchar(12) NOT NULL
 );
 
 CREATE TABLE doctors (
