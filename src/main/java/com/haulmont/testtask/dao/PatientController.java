@@ -77,12 +77,12 @@ public class PatientController extends JDBCcontroller implements IController<Pat
             }
         }
 
-        return patients;
+        return patients == null ? null : patients;
 
     }
 
     @Override
-    public Patient getById(Long id) throws SQLException {
+    public Patient getById(final Long id) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;

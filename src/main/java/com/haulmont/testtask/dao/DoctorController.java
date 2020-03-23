@@ -82,7 +82,7 @@ public class DoctorController extends JDBCcontroller implements IController<Doct
     }
 
     @Override
-    public Doctor getById(Long id) throws SQLException {
+    public Doctor getById(final Long id) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;

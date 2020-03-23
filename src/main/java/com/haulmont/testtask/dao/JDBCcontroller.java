@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class JDBCcontroller {
 
     private static final String dbDriver = "org.hsqldb.jdbc.JDBCDriver";
-    private static final String dbUrl = "jdbc:hsqldb:file:/home/av/test-task/db/policlinicdb";
+    private static final String dbUrl = "jdbc:hsqldb:file:~/test-task/db/policlinicdb";
     private static final String dbUsername = "SA";
     private static final String dbPassword = "";
     protected Connection connection;
@@ -29,10 +29,6 @@ public class JDBCcontroller {
         }
 
         return connection;
-
-    }
-
-    private void getUrl() {
 
     }
 

@@ -9,7 +9,7 @@ public interface IController<T> {
 
     List<T> getAll() throws SQLException;
 
-    T getById(Long id) throws SQLException;
+    T getById(final Long id) throws SQLException;
 
     void update(T t) throws SQLException;
 

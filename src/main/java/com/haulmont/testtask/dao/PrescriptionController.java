@@ -1,5 +1,7 @@
 package com.haulmont.testtask.dao;
 
+import com.haulmont.testtask.model.Doctor;
+import com.haulmont.testtask.model.Patient;
 import com.haulmont.testtask.model.Prescription;
 
 import java.sql.*;
@@ -14,18 +16,18 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
         connection = getConnection();
         PreparedStatement ps = null;
 
-        String sql = "INSERT INTO patients (description, patient, doctor, dateCreate, validity, priority)" +
+        String sql = "INSERT INTO prescriptions (description, patient_id, doctor_id, dateCreate, validity, priority)" +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
 
             ps = connection.prepareStatement(sql);
             ps.setString(1, prescription.getDescription());
-            ps.setString(2, prescription.getPatient());
-            ps.setString(3, prescription.getDoctor());
-            ps.setDate(4, (Date) prescription.getDateCreate());
-            ps.setDate(5, (Date) prescription.getValidity());
-            ps.setString(6, prescription.getPriority());
+            ps.setLong(2, prescription.getPatient().getId());
+            ps.setLong(3, prescription.getDoctor().getId());
+            ps.setDate(4, Date.valueOf(prescription.getCreated()));
+            ps.setDate(5, Date.valueOf(prescription.getValidity()));
+            ps.setString(6, prescription.getPriority().toString());
 
             ps.executeUpdate();
 
@@ -45,10 +47,16 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
     @Override
     public List<Prescription> getAll() throws SQLException {
 
+        IController<Patient> patientController = new PatientController();
+        IController<Doctor> doctorController = new DoctorController();
+
+        List<Patient> patients = patientController.getAll();
+        List<Doctor> doctors = doctorController.getAll();
+
         connection = getConnection();
         Statement statement = null;
 
-        String sql = "SELECT id, description, patient, doctor, dateCreate, validity, priority FROM prescription";
+        String sql = "SELECT id, description, patient_id, doctor_id, created, validity, priority FROM prescriptions";
 
         List<Prescription> prescriptions = new ArrayList();
 
@@ -57,15 +65,24 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
 
+
+
             while (rs.next()) {
 
                 Prescription prescription = new Prescription();
                 prescription.setId(rs.getLong("id"));
                 prescription.setDescription(rs.getString("description"));
-                prescription.setPatient(rs.getString("patient"));
-                prescription.setDoctor(rs.getString("doctor"));
-                prescription.setDateCreate(rs.getDate("dateCreate"));
-                prescription.setValidity(rs.getDate("validity"));
+
+                for (Patient p: patients) {
+                    if (p.getId() == rs.getLong("patient_id")) prescription.setPatient(p);
+                }
+
+                for (Doctor d: doctors) {
+                    if (d.getId() == rs.getLong("doctor_id")) prescription.setDoctor(d);
+                }
+
+                prescription.setCreated(rs.getDate("created").toLocalDate());
+                prescription.setValidity(rs.getDate("validity").toLocalDate());
                 prescription.setPriority(rs.getString("priority"));
 
                 prescriptions.add(prescription);
@@ -87,13 +104,19 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
     }
 
     @Override
-    public Prescription getById(Long id) throws SQLException {
+    public Prescription getById(final Long id) throws SQLException {
+
+        IController<Patient> patientController = new PatientController();
+        IController<Doctor> doctorController = new DoctorController();
+
+        List<Patient> patients = patientController.getAll();
+        List<Doctor> doctors = doctorController.getAll();
 
         connection = getConnection();
         PreparedStatement ps = null;
 
-        String sql = "SELECT id, description, patient, doctor, dateCreate, validity, priority " +
-                "FROM prescription WHERE id=?";
+        String sql = "SELECT id, description, patient_id, doctor_id, created, validity, priority " +
+                "FROM prescriptions WHERE id=?";
 
         Prescription prescription = new Prescription();
 
@@ -105,10 +128,17 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
 
             prescription.setId(rs.getLong("id"));
             prescription.setDescription(rs.getString("description"));
-            prescription.setPatient(rs.getString("patient"));
-            prescription.setDoctor(rs.getString("doctor"));
-            prescription.setDateCreate(rs.getDate("dateCreate"));
-            prescription.setValidity(rs.getDate("validity"));
+
+            for (Patient p: patients) {
+                if (p.getId() == rs.getLong("patient_id")) prescription.setPatient(p);
+            }
+
+            for (Doctor d: doctors) {
+                if (d.getId() == rs.getLong("doctor_id")) prescription.setDoctor(d);
+            }
+
+            prescription.setCreated(rs.getDate("created").toLocalDate());
+            prescription.setValidity(rs.getDate("validity").toLocalDate());
             prescription.setPriority(rs.getString("priority"));
 
             ps.executeUpdate();
@@ -134,17 +164,17 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
         connection = getConnection();
         PreparedStatement ps = null;
 
-        String sql = "UPDATE prescriptions SET desctiption=?, patient=?, doctor=?, dateCreate=?, validity=?, priority=? WHERE id=?";
+        String sql = "UPDATE prescriptions SET desctiption=?, patient_id=?, doctor_id=?, created=?, validity=?, priority=? WHERE id=?";
 
         try {
 
             ps = connection.prepareStatement(sql);
             ps.setString(1, prescription.getDescription());
-            ps.setString(2, prescription.getPatient());
-            ps.setString(3, prescription.getDoctor());
-            ps.setDate(4, (Date) prescription.getDateCreate());
-            ps.setDate(5, (Date) prescription.getValidity());
-            ps.setString(6, prescription.getPriority());
+            ps.setLong(2, prescription.getPatient().getId());
+            ps.setLong(3, prescription.getDoctor().getId());
+            ps.setDate(4, Date.valueOf(prescription.getCreated()));
+            ps.setDate(5, Date.valueOf(prescription.getValidity()));
+            ps.setString(6, prescription.getPriority().toString());
             ps.setLong(7, prescription.getId());
 
             ps.executeUpdate();
@@ -190,4 +220,5 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
         }
 
     }
+
 }
