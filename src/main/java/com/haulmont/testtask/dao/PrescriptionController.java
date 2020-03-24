@@ -11,12 +11,12 @@ import java.util.List;
 public class PrescriptionController extends JDBCcontroller implements IController<Prescription> {
 
     @Override
-    public void add(Prescription prescription) throws SQLException {
+    public void add(final Prescription prescription) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;
 
-        String sql = "INSERT INTO prescriptions (description, patient_id, doctor_id, dateCreate, validity, priority)" +
+        String sql = "INSERT INTO prescriptions (description, patient_id, doctor_id, created, validity, priority)" +
                 "VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
@@ -159,12 +159,12 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
     }
 
     @Override
-    public void update(Prescription prescription) throws SQLException {
+    public void update(final Prescription prescription) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;
 
-        String sql = "UPDATE prescriptions SET desctiption=?, patient_id=?, doctor_id=?, created=?, validity=?, priority=? WHERE id=?";
+        String sql = "UPDATE prescriptions SET description=?, patient_id=?, doctor_id=?, created=?, validity=?, priority=? WHERE id=?";
 
         try {
 
@@ -174,7 +174,7 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
             ps.setLong(3, prescription.getDoctor().getId());
             ps.setDate(4, Date.valueOf(prescription.getCreated()));
             ps.setDate(5, Date.valueOf(prescription.getValidity()));
-            ps.setString(6, prescription.getPriority().toString());
+            ps.setString(6, prescription.getPriority());
             ps.setLong(7, prescription.getId());
 
             ps.executeUpdate();
@@ -182,10 +182,10 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            if (!ps.isClosed()) {
+            if (ps != null) {
                 ps.close();
             }
-            if (!connection.isClosed()) {
+            if (connection != null) {
                 connection.close();
             }
         }
@@ -193,7 +193,7 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
     }
 
     @Override
-    public void remove(Prescription prescription) throws SQLException {
+    public void remove(final Prescription prescription) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;
@@ -218,6 +218,79 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
             }
 
         }
+
+    }
+
+    public List<Prescription> getFilter(final String description, final Long patientId, final String prescriptionPriority) throws SQLException {
+
+        IController<Patient> patientController = new PatientController();
+        IController<Doctor> doctorController = new DoctorController();
+
+        List<Patient> patients = patientController.getAll();
+        List<Doctor> doctors = doctorController.getAll();
+
+        connection = getConnection();
+        Statement statement = null;
+
+        String where = " WHERE ";
+        if (description != null) {
+            where += "description LIKE '%" + description + "%'";
+            if (patientId != null || prescriptionPriority != null) {
+                where += " AND ";
+            }
+        }
+        if (patientId != null) {
+            where += "patient_id = '" + patientId.toString() + "'";
+            if (prescriptionPriority != null) {
+                where += " AND ";
+            }
+        }
+        if (prescriptionPriority != null) {
+            where += "priority = '" + prescriptionPriority + "'";
+        }
+
+        String sql = "SELECT id, description, patient_id, doctor_id, created, validity, priority FROM prescriptions" + where;
+
+        List<Prescription> prescriptions = new ArrayList();
+
+        try {
+
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(sql);
+
+            while (rs.next()) {
+
+                Prescription prescription = new Prescription();
+                prescription.setId(rs.getLong("id"));
+                prescription.setDescription(rs.getString("description"));
+
+                for (Patient p: patients) {
+                    if (p.getId() == rs.getLong("patient_id")) prescription.setPatient(p);
+                }
+
+                for (Doctor d: doctors) {
+                    if (d.getId() == rs.getLong("doctor_id")) prescription.setDoctor(d);
+                }
+
+                prescription.setCreated(rs.getDate("created").toLocalDate());
+                prescription.setValidity(rs.getDate("validity").toLocalDate());
+                prescription.setPriority(rs.getString("priority"));
+
+                prescriptions.add(prescription);
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (!statement.isClosed()) {
+                statement.close();
+            }
+            if (!connection.isClosed()) {
+                connection.close();
+            }
+        }
+
+        return prescriptions;
 
     }
 
