@@ -9,7 +9,7 @@ import java.util.List;
 public class DoctorController extends JDBCcontroller implements IController<Doctor> {
 
     @Override
-    public void add(Doctor doctor) throws SQLException {
+    public void add(final Doctor doctor) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;
@@ -121,7 +121,7 @@ public class DoctorController extends JDBCcontroller implements IController<Doct
     }
 
     @Override
-    public void update(Doctor doctor) throws SQLException {
+    public void update(final Doctor doctor) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;
@@ -153,7 +153,7 @@ public class DoctorController extends JDBCcontroller implements IController<Doct
     }
 
     @Override
-    public void remove(Doctor doctor) throws SQLException {
+    public void remove(final Doctor doctor) throws SQLException {
 
         connection = getConnection();
         PreparedStatement ps = null;

@@ -5,14 +5,14 @@ import java.util.List;
 
 public interface IController<T> {
 
-    void add(T t) throws SQLException;
+    void add(final T t) throws SQLException;
 
     List<T> getAll() throws SQLException;
 
     T getById(final Long id) throws SQLException;
 
-    void update(T t) throws SQLException;
+    void update(final T t) throws SQLException;
 
-    void remove(T t) throws SQLException;
+    void remove(final T t) throws SQLException;
 
 }
