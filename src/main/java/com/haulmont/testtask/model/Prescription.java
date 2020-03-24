@@ -33,7 +33,7 @@ public class Prescription extends BaseModel {
     }
 
     public String getPriority() {
-        return priority.toString();
+        return priority;
     }
 
     public void setDescription(final String description) {
