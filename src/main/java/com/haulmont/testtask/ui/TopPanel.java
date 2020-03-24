@@ -13,20 +13,29 @@ public class TopPanel {
 
     private Layout currentGrid;
 
-    public TopPanel(final Layout parentLayout) throws SQLException {
+    private Layout parentLayout;
+
+    public TopPanel(final Layout parentLayout) {
+        this.parentLayout = parentLayout;
+    }
+
+    public HorizontalLayout getTopButtons() throws SQLException {
 
         final HorizontalLayout topButtons = new HorizontalLayout();
         topButtons.setMargin(true);
 
         Button buttonPatients = new Button("Пациенты");
+        buttonPatients.setWidth("200");
         BaseGrid<Patient> patientsGrid = new PatientsGrid();
         addButtonClickListener(buttonPatients, parentLayout, patientsGrid);
 
         Button buttonDoctors = new Button("Врачи");
+        buttonDoctors.setWidth("200");
         BaseGrid<Doctor> doctorsGrid = new DoctorsGrid();
         addButtonClickListener(buttonDoctors, parentLayout, doctorsGrid);
 
         Button buttonPrescriptions = new Button("Рецепты");
+        buttonPrescriptions.setWidth("200");
         BaseGrid<Prescription> prescriptionGrid = new PrescriptionsGrid();
         addButtonClickListener(buttonPrescriptions, parentLayout, prescriptionGrid);
 
@@ -34,29 +43,22 @@ public class TopPanel {
         topButtons.addComponent(buttonDoctors);
         topButtons.addComponent(buttonPrescriptions);
 
-        parentLayout.addComponent(topButtons);
+        return topButtons;
 
     }
 
     private void addButtonClickListener(final Button button,final Layout parentLayout, final BaseGrid bg) {
 
-        button.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-
-                Layout newLayout = bg.getButtonsAndGrid();
-
-                if (currentGrid != null) {
-                    parentLayout.replaceComponent(currentGrid, newLayout);
-                } else {
-                    parentLayout.addComponent(newLayout);
-                }
-
-                currentGrid = newLayout;
-
+        button.addClickListener(event -> {
+            Layout newLayout = bg.getButtonsAndGrid();
+            if (currentGrid != null) {
+                parentLayout.replaceComponent(currentGrid, newLayout);
+            } else {
+                parentLayout.addComponent(newLayout);
             }
+            currentGrid = newLayout;
         });
+
     }
 
 }

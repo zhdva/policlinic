@@ -18,7 +18,7 @@ public class BaseGrid<T> {
 
     protected Grid<T> grid = new Grid<>();
 
-    protected FormLayout getForm(final boolean edit, final Window window) {
+    protected FormLayout getForm(final boolean edit, final Window window) throws SQLException {
         return null;
     }
 
@@ -49,6 +49,7 @@ public class BaseGrid<T> {
                 }
             }
         });
+        removeButton.setWidth("150");
         return removeButton;
     }
 
@@ -63,24 +64,36 @@ public class BaseGrid<T> {
     }
 
     protected void getButtons(final String addWindowCaption,
-                           final String editWindowCaption,
-                           final String windowWidth) {
+                              final String editWindowCaption,
+                              final String windowWidth) {
 
         Button add = new Button("Добавить");
+        add.setWidth("150");
         add.addClickListener(event -> {
             Window addWindow = getWindow(addWindowCaption);
             addWindow.setWidth(windowWidth);
-            FormLayout addForm = getForm(false, addWindow);
+            FormLayout addForm = null;
+            try {
+                addForm = getForm(false, addWindow);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             addWindow.setContent(addForm);
             UI.getCurrent().addWindow(addWindow);
         });
 
         Button edit = new Button("Изменить");
+        edit.setWidth("150");
         edit.addClickListener(event -> {
             if (selectedItem != null) {
                 Window editWindow = getWindow(editWindowCaption);
                 editWindow.setWidth(windowWidth);
-                FormLayout editForm = getForm(true, editWindow);
+                FormLayout editForm = null;
+                try {
+                    editForm = getForm(true, editWindow);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 editWindow.setContent(editForm);
                 UI.getCurrent().addWindow(editWindow);
             }
