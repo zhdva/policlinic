@@ -3,14 +3,19 @@ package com.haulmont.testtask.model;
 import java.time.LocalDate;
 import java.util.*;
 
-public class Prescription extends BaseModel {
+public class Prescription {
 
+    private Long id;
     private String description;
     private Patient patient;
     private Doctor doctor;
     private LocalDate created;
     private LocalDate validity;
     private String priority;
+
+    public Long getId() {
+        return id;
+    }
 
     public String getDescription() {
         return description;
@@ -34,6 +39,10 @@ public class Prescription extends BaseModel {
 
     public String getPriority() {
         return priority;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setDescription(final String description) {
