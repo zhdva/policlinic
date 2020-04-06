@@ -1,20 +1,12 @@
 package com.haulmont.testtask;
 
-import com.haulmont.testtask.dao.DoctorController;
-import com.haulmont.testtask.dao.IController;
-import com.haulmont.testtask.dao.PatientController;
-import com.haulmont.testtask.dao.PrescriptionController;
-import com.haulmont.testtask.model.Doctor;
-import com.haulmont.testtask.model.Patient;
-import com.haulmont.testtask.model.Prescription;
-import com.haulmont.testtask.ui.TopPanel;
+import com.haulmont.testtask.view.TopPanel;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 
 import java.sql.SQLException;
-import java.util.List;
 
 @Theme(ValoTheme.THEME_NAME)
 public class MainUI extends UI {
@@ -22,13 +14,13 @@ public class MainUI extends UI {
         @Override
         protected void init(VaadinRequest vaadinRequest) {
 
-            final VerticalLayout vLayout = new VerticalLayout();
-            vLayout.setMargin(true);
-            setContent(vLayout);
+            final VerticalLayout ui = new VerticalLayout();
+            ui.setMargin(true);
+            setContent(ui);
 
             try {
-                TopPanel tp = new TopPanel(vLayout);
-                vLayout.addComponent(tp.getTopButtons());
+                TopPanel tp = new TopPanel(ui);
+                ui.addComponent(tp.getTopButtons());
             } catch (SQLException e) {
                 e.printStackTrace();
             }

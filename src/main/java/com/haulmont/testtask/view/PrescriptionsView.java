@@ -1,4 +1,4 @@
-package com.haulmont.testtask.ui;
+package com.haulmont.testtask.view;
 
 import com.haulmont.testtask.dao.DoctorController;
 import com.haulmont.testtask.dao.PatientController;
@@ -13,20 +13,24 @@ import com.vaadin.ui.*;
 import java.sql.SQLException;
 import java.util.List;
 
-public class PrescriptionsGrid extends BaseGrid<Prescription> {
+public class PrescriptionsView extends BaseView<Prescription> {
 
-    public PrescriptionsGrid() throws SQLException {
-        controller = new PrescriptionController();
-        configGrid();
-        setGrid();
-        getButtons("Добавить рецепт", "Редактирование рецепта", "500");
-        buttonsAndGrid.addComponents(new Label("Список рецептов"), buttons, filter(), grid);
+    public PrescriptionsView() throws SQLException {
+        setController(new PrescriptionController());
+        setGrid(getPrescriptionsGrid());
+        SingleSelect<Prescription> selection = getGrid().asSingleSelect();
+        setSelection(selection);
+        setAddWindow("Добавить рецепт");
+        setEditWindow("Редактирование рецепта");
+        HorizontalLayout buttons = getButtons("500");
+        VerticalLayout buttonsAndGrid = getButtonsAndGrid();
+        buttonsAndGrid.addComponents(new Label("Список рецептов"), buttons, filter(), getGrid());
     }
 
     @Override
-    protected FormLayout getForm(final boolean edit, final Window window) throws SQLException {
+    protected FormLayout getAddEditForm(final boolean edit, final Window window) throws SQLException {
 
-        FormLayout form = new FormLayout();
+        FormLayout addEditForm = new FormLayout();
         Binder<Prescription> binder = new Binder<>();
 
         TextArea description = new TextArea("Описание");
@@ -70,7 +74,8 @@ public class PrescriptionsGrid extends BaseGrid<Prescription> {
                 .asRequired("Укажите приоритет")
                 .bind(Prescription::getPriority, Prescription::setPriority);
 
-        if (selectedItem != null && edit) {
+        if (getSelectedItem() != null && edit) {
+            Prescription selectedItem = getSelectedItem();
             description.setValue(selectedItem.getDescription());
             patient.setValue(selectedItem.getPatient());
             doctor.setValue(selectedItem.getDoctor());
@@ -79,61 +84,33 @@ public class PrescriptionsGrid extends BaseGrid<Prescription> {
             priority.setValue(selectedItem.getPriority());
         }
 
-        Button ok = new Button("OK");
-        ok.setWidth("100");
-        ok.addClickListener(event -> {
-            try {
-                if (edit) {
-                    if (binder.writeBeanIfValid(selectedItem)) {
-                        controller.update(selectedItem);
-                        selectedItem = null;
-                        window.close();
-                    }
-                } else {
-                    Prescription newPrescription = new Prescription();
-                    if (binder.writeBeanIfValid(newPrescription)) {
-                        controller.add(newPrescription);
-                        selectedItem = null;
-                        window.close();
-                    }
-                }
-                grid.setItems(controller.getAll());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
+        addEditForm.addComponents(description,
+                            patient,
+                            doctor,
+                            created,
+                            validity,
+                            priority,
+                            getActions(edit, binder, window, new Prescription()));
+        addEditForm.setMargin(true);
 
-        Button cancel = new Button("Отменить");
-        cancel.setWidth("100");
-        cancel.addClickListener(event -> {
-            window.close();
-        });
-
-        HorizontalLayout actions = new HorizontalLayout();
-        actions.addComponents(ok, cancel);
-
-        form.addComponent(description);
-        form.addComponent(patient);
-        form.addComponent(doctor);
-        form.addComponent(created);
-        form.addComponent(validity);
-        form.addComponent(priority);
-        form.addComponent(actions);
-        form.setMargin(true);
-
-        return form;
+        return addEditForm;
 
     }
 
-    private void setGrid() throws SQLException {
-        grid.addColumn(Prescription::getDescription).setCaption("Описание").setWidth(400);
-        grid.addColumn(Prescription::getPatient).setCaption("Пациент").setWidth(200);
-        grid.addColumn(Prescription::getDoctor).setCaption("Врач").setWidth(200);
-        grid.addColumn(Prescription::getCreated).setCaption("Дата создания").setWidth(150);
-        grid.addColumn(Prescription::getValidity).setCaption("Срок действия").setWidth(150);
-        grid.addColumn(Prescription::getPriority).setCaption("Приоритет").setWidth(150);
-        grid.setItems(controller.getAll());
-        grid.setWidth("1265");
+    private Grid getPrescriptionsGrid() throws SQLException {
+
+        Grid<Prescription> prescriptionsGrid = new Grid<>();
+
+        prescriptionsGrid.addColumn(Prescription::getDescription).setCaption("Описание").setWidth(400);
+        prescriptionsGrid.addColumn(Prescription::getPatient).setCaption("Пациент").setWidth(200);
+        prescriptionsGrid.addColumn(Prescription::getDoctor).setCaption("Врач").setWidth(200);
+        prescriptionsGrid.addColumn(Prescription::getCreated).setCaption("Дата создания").setWidth(150);
+        prescriptionsGrid.addColumn(Prescription::getValidity).setCaption("Срок действия").setWidth(150);
+        prescriptionsGrid.addColumn(Prescription::getPriority).setCaption("Приоритет").setWidth(150);
+        prescriptionsGrid.setItems(getController().getAll());
+        prescriptionsGrid.setWidth("1265");
+
+        return prescriptionsGrid;
     }
 
     private HorizontalLayout filter() throws SQLException {
@@ -165,7 +142,7 @@ public class PrescriptionsGrid extends BaseGrid<Prescription> {
             if (patient != null) patientId = patient.getId();
             String priority = (String) priorityFilter.getValue();
             try {
-                grid.setItems(new PrescriptionController().getFilter(description, patientId, priority));
+                getGrid().setItems(new PrescriptionController().getFilter(description, patientId, priority));
             } catch (SQLException e) {
                 e.printStackTrace();
             }
