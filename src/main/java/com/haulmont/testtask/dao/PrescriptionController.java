@@ -1,12 +1,12 @@
 package com.haulmont.testtask.dao;
 
-import com.haulmont.testtask.model.Doctor;
-import com.haulmont.testtask.model.Patient;
-import com.haulmont.testtask.model.Prescription;
+import com.haulmont.testtask.model.*;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PrescriptionController extends JDBCcontroller implements IController<Prescription> {
 
@@ -47,40 +47,28 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
     @Override
     public List<Prescription> getAll() throws SQLException {
 
-        IController<Patient> patientController = new PatientController();
-        IController<Doctor> doctorController = new DoctorController();
-
-        List<Patient> patients = patientController.getAll();
-        List<Doctor> doctors = doctorController.getAll();
+        Map<Long, Patient> patientsMap = getMap(new PatientController());
+        Map<Long, Doctor> doctorsMap = getMap(new DoctorController());
 
         connection = getConnection();
         Statement statement = null;
 
         String sql = "SELECT id, description, patient_id, doctor_id, created, validity, priority FROM prescriptions";
 
-        List<Prescription> prescriptions = new ArrayList();
+        List<Prescription> prescriptions = new ArrayList<>();
 
         try {
 
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
 
-
-
             while (rs.next()) {
 
                 Prescription prescription = new Prescription();
                 prescription.setId(rs.getLong("id"));
                 prescription.setDescription(rs.getString("description"));
-
-                for (Patient p: patients) {
-                    if (p.getId() == rs.getLong("patient_id")) prescription.setPatient(p);
-                }
-
-                for (Doctor d: doctors) {
-                    if (d.getId() == rs.getLong("doctor_id")) prescription.setDoctor(d);
-                }
-
+                prescription.setPatient(patientsMap.get(rs.getLong("patient_id")));
+                prescription.setDoctor(doctorsMap.get(rs.getLong("doctor_id")));
                 prescription.setCreated(rs.getDate("created").toLocalDate());
                 prescription.setValidity(rs.getDate("validity").toLocalDate());
                 prescription.setPriority(rs.getString("priority"));
@@ -251,7 +239,7 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
 
         String sql = "SELECT id, description, patient_id, doctor_id, created, validity, priority FROM prescriptions" + where;
 
-        List<Prescription> prescriptions = new ArrayList();
+        List<Prescription> prescriptions = new ArrayList<>();
 
         try {
 
@@ -291,6 +279,18 @@ public class PrescriptionController extends JDBCcontroller implements IControlle
         }
 
         return prescriptions;
+
+    }
+
+    private <T extends Person> Map<Long, T> getMap(final IController<T> controller) throws SQLException {
+
+        Map<Long, T> map = new HashMap<>();
+
+        for (T t: controller.getAll()) {
+            map.put(t.getId(), t);
+        }
+
+        return map;
 
     }
 
