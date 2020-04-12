@@ -140,7 +140,7 @@ public class BaseView<T> {
         return window;
     }
 
-    protected HorizontalLayout getActions(final boolean edit, final Binder binder, final Window window, final T t) {
+    protected HorizontalLayout getActions(final boolean edit, final Binder<T> binder, final Window window, final T t) {
 
         final String buttonSize = "100";
 

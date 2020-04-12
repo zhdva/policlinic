@@ -9,8 +9,7 @@ import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class DoctorsView extends BaseView<Doctor> {
 
@@ -22,7 +21,7 @@ public class DoctorsView extends BaseView<Doctor> {
         setAddWindow("Добавить врача");
         setEditWindow("Редактирование врача");
         HorizontalLayout buttons = getButtons("400");
-        buttons.addComponent(statisticsButton());
+        buttons.addComponent(statisticButton());
         VerticalLayout buttonsAndGrid = getButtonsAndGrid();
         buttonsAndGrid.addComponents(new Label("Список врачей"), buttons, getGrid());
     }
@@ -30,7 +29,7 @@ public class DoctorsView extends BaseView<Doctor> {
     @Override
     protected FormLayout getAddEditForm(final boolean edit, final Window window) {
 
-        Binder<Doctor> binder = new Binder();
+        Binder<Doctor> binder = new Binder<>();
         FormLayout addEditForm = PersonView.getPersonAddEditForm(edit, binder, getSelectedItem());
 
         TextField specialization = new TextField("Специализация");
@@ -50,9 +49,9 @@ public class DoctorsView extends BaseView<Doctor> {
 
     }
 
-    private Grid getDoctorsGrid() throws SQLException {
+    private Grid<Doctor> getDoctorsGrid() throws SQLException {
 
-        Grid<Doctor> doctorsGrid = PersonView.<Doctor>getPersonsGrid();
+        Grid<Doctor> doctorsGrid = PersonView.getPersonsGrid();
 
         doctorsGrid.addColumn(Doctor::getSpecialization).setCaption("Специализация").setWidth(200);
         doctorsGrid.setItems(new DoctorController().getAll());
@@ -62,63 +61,42 @@ public class DoctorsView extends BaseView<Doctor> {
 
     }
 
-    private Button statisticsButton() throws SQLException {
+    private Button statisticButton() throws SQLException {
 
-        Grid<DoctorsStatistic> statisticsGrid = new Grid();
-        statisticsGrid.addColumn(DoctorsStatistic::getDoctor).setCaption("Врач").setWidth(400);
-        statisticsGrid.addColumn(DoctorsStatistic::getNumberOfPrescriptions).setCaption("Количество рецептов").setWidth(200);
-        statisticsGrid.setItems(statisticsList());
-        statisticsGrid.setFrozenColumnCount(2);
-        statisticsGrid.setWidth("615");
+        Grid<Map.Entry<Doctor, Integer>> statisticGrid = new Grid<>();
+        Set<Map.Entry<Doctor, Integer>> it = statisticMap().entrySet();
 
-        Button statisticsButton = new Button("Показать статистику");
-        statisticsButton.setWidth("200");
-        statisticsButton.addClickListener(event -> {
-            Window statisticsWindow = new Window("Статистика", statisticsGrid);
+        statisticGrid.addColumn(Map.Entry::getKey).setCaption("Врач").setWidth(400);
+        statisticGrid.addColumn(Map.Entry::getValue).setCaption("Количество рецептов").setWidth(200);
+        statisticGrid.setItems(it);
+        statisticGrid.setWidth("615");
+
+        Button statisticButton = new Button("Показать статистику");
+        statisticButton.setWidth("200");
+        statisticButton.addClickListener(event -> {
+            Window statisticsWindow = new Window("Статистика", statisticGrid);
             statisticsWindow.center();
             statisticsWindow.setResizable(false);
             statisticsWindow.setWidth("615");
             UI.getCurrent().addWindow(statisticsWindow);
         });
 
-        return statisticsButton;
+        return statisticButton;
+
     }
 
-    private List<DoctorsStatistic> statisticsList() throws SQLException {
-
-        List<DoctorsStatistic> statisticsList = new ArrayList<>();
+    private Map<Doctor, Integer> statisticMap() throws SQLException {
 
         List<Prescription> prescriptionsList = new PrescriptionController().getAll();
 
-        for (Doctor d: getController().getAll()) {
-            int count = 0;
-            for (Prescription p: prescriptionsList) {
-                if (d.toString().equals(p.getDoctor().toString())) count++;
-            }
-            statisticsList.add(new DoctorsStatistic(d, count));
+        Map<Doctor, Integer> stat = new HashMap<>();
+
+        for (Prescription p: prescriptionsList) {
+            int count = stat.get(p.getDoctor()) != null ? stat.get(p.getDoctor()) + 1 : 1;
+            stat.put(p.getDoctor(), count);
         }
 
-        return statisticsList;
-
-    }
-
-    private class DoctorsStatistic {
-
-        private final Doctor doctor;
-        private final int numberOfPrescriptions;
-
-        DoctorsStatistic(final Doctor doctor, final int number) {
-            this.doctor = doctor;
-            this.numberOfPrescriptions = number;
-        }
-
-        Doctor getDoctor() {
-            return doctor;
-        }
-
-        int getNumberOfPrescriptions() {
-            return numberOfPrescriptions;
-        }
+        return stat;
 
     }
 

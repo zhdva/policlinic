@@ -26,8 +26,8 @@ public class PatientsView extends BaseView<Patient> {
     @Override
     protected FormLayout getAddEditForm(final boolean edit, final Window window) {
 
-        Binder<Patient> binder = new Binder();
-        FormLayout addEditForm = PersonView.<Patient>getPersonAddEditForm(edit, binder, getSelectedItem());
+        Binder<Patient> binder = new Binder<>();
+        FormLayout addEditForm = PersonView.getPersonAddEditForm(edit, binder, getSelectedItem());
 
         TextField phone = new TextField("Телефон");
         phone.setWidth("250");
@@ -49,7 +49,7 @@ public class PatientsView extends BaseView<Patient> {
 
     }
 
-    private Grid getPatientsGrid() throws SQLException {
+    private Grid<Patient> getPatientsGrid() throws SQLException {
 
         Grid<Patient> patientsGrid = PersonView.<Patient>getPersonsGrid();
 

@@ -47,7 +47,7 @@ public class PersonView {
 
     }
 
-    protected static <T extends Person> Grid getPersonsGrid() throws SQLException {
+    protected static <T extends Person> Grid<T> getPersonsGrid() throws SQLException {
 
         Grid<T> personsGrid = new Grid<>();
 

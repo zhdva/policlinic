@@ -40,14 +40,14 @@ public class PrescriptionsView extends BaseView<Prescription> {
                 .withValidator(new StringLengthValidator("Укажите описание", 1, null))
                 .bind(Prescription::getDescription, Prescription::setDescription);
 
-        ComboBox<Patient> patient = new ComboBox("Пациент");
+        ComboBox<Patient> patient = new ComboBox<>("Пациент");
         patient.setItems(new PatientController().getAll());
         patient.setWidth("350");
         binder.forField(patient)
                 .asRequired("Укажите пациента")
                 .bind(Prescription::getPatient, Prescription::setPatient);
 
-        ComboBox<Doctor> doctor = new ComboBox("Врач");
+        ComboBox<Doctor> doctor = new ComboBox<>("Врач");
         doctor.setItems(new DoctorController().getAll());
         doctor.setWidth("350");
         binder.forField(doctor)
@@ -66,7 +66,7 @@ public class PrescriptionsView extends BaseView<Prescription> {
                 .asRequired("Укажите срок действия")
                 .bind(Prescription::getValidity, Prescription::setValidity);
 
-        ComboBox<String> priority = new ComboBox("Приоритет");
+        ComboBox<String> priority = new ComboBox<>("Приоритет");
         priority.setWidth("350");
         List<String> prescriptionPrioritiesList = new Prescription().getListPriorities();
         priority.setItems(prescriptionPrioritiesList);
@@ -97,7 +97,7 @@ public class PrescriptionsView extends BaseView<Prescription> {
 
     }
 
-    private Grid getPrescriptionsGrid() throws SQLException {
+    private Grid<Prescription> getPrescriptionsGrid() throws SQLException {
 
         Grid<Prescription> prescriptionsGrid = new Grid<>();
 
@@ -121,13 +121,13 @@ public class PrescriptionsView extends BaseView<Prescription> {
         descriptionFilter.setWidth("400");
         descriptionFilter.setPlaceholder("Описание");
 
-        ComboBox patientFilter = new ComboBox();
+        ComboBox<Patient> patientFilter = new ComboBox<>();
         patientFilter.setWidth("300");
         patientFilter.setItems(new PatientController().getAll());
         patientFilter.setPlaceholder("Пациент");
         patientFilter.setEmptySelectionAllowed(true);
 
-        ComboBox priorityFilter = new ComboBox();
+        ComboBox<String> priorityFilter = new ComboBox<>();
         priorityFilter.setWidth("200");
         List<String> prescriptionPrioritiesList = new Prescription().getListPriorities();
         priorityFilter.setItems(prescriptionPrioritiesList);
@@ -137,10 +137,10 @@ public class PrescriptionsView extends BaseView<Prescription> {
         apply.setWidth("150");
         apply.addClickListener(event -> {
             String description = descriptionFilter.getValue();
-            Patient patient = (Patient) patientFilter.getValue();
+            Patient patient = patientFilter.getValue();
             Long patientId = null;
             if (patient != null) patientId = patient.getId();
-            String priority = (String) priorityFilter.getValue();
+            String priority = priorityFilter.getValue();
             try {
                 getGrid().setItems(new PrescriptionController().getFilter(description, patientId, priority));
             } catch (SQLException e) {

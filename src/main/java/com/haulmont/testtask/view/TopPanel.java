@@ -10,15 +10,15 @@ public class TopPanel {
 
     private Layout currentGrid;
 
-    private Layout parentLayout;
-
-    private String buttonSize = "200";
+    private final Layout parentLayout;
 
     public TopPanel(final Layout parentLayout) {
         this.parentLayout = parentLayout;
     }
 
     public HorizontalLayout getTopButtons() throws SQLException {
+
+        String buttonSize = "200";
 
         final HorizontalLayout topButtons = new HorizontalLayout();
         topButtons.setMargin(true);
