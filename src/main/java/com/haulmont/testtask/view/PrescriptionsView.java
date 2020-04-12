@@ -146,7 +146,6 @@ public class PrescriptionsView extends BaseView<Prescription> {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            System.out.println(description + patientId + priority);
         });
 
         filter.addComponents(descriptionFilter, patientFilter, priorityFilter, apply);
