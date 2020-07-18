@@ -17,8 +17,10 @@ public class HibernateConfig {
 
             Configuration configuration = new Configuration().configure("hibernate.cfg.xml");
 
+            configuration.addAnnotatedClass(Person.class);
             configuration.addAnnotatedClass(Doctor.class);
             configuration.addAnnotatedClass(Patient.class);
+            configuration.addAnnotatedClass(Priority.class);
             configuration.addAnnotatedClass(Prescription.class);
 
             StandardServiceRegistryBuilder builder = new StandardServiceRegistryBuilder()
