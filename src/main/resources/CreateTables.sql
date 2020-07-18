@@ -18,6 +18,11 @@ CREATE TABLE doctors (
     specialization varchar(50) NOT NULL
 );
 
+CREATE TABLE priorities (
+    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+    priority varchar(50) NOT NULL
+);
+
 CREATE TABLE prescriptions (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     description varchar(500) NOT NULL,
@@ -26,9 +31,4 @@ CREATE TABLE prescriptions (
     created date NOT NULL,
     validity date NOT NULL,
     priority_id bigint NOT NULL REFERENCES priorities (id)
-);
-
-CREATE TABLE priorities (
-    id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-    priority varchar(50) NOT NULL
 );
