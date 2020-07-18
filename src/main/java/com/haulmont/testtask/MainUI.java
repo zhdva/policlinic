@@ -14,16 +14,12 @@ public class MainUI extends UI {
         @Override
         protected void init(VaadinRequest vaadinRequest) {
 
-            final VerticalLayout ui = new VerticalLayout();
+            VerticalLayout ui = new VerticalLayout();
             ui.setMargin(true);
             setContent(ui);
 
-            try {
-                TopPanel tp = new TopPanel(ui);
-                ui.addComponent(tp.getTopButtons());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            TopPanel tp = new TopPanel(ui);
+            ui.addComponent(tp.getTopButtons());
 
         }
 
