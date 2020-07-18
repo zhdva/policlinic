@@ -1,34 +1,32 @@
 package com.haulmont.testtask.view;
 
-import com.haulmont.testtask.dao.DoctorController;
-import com.haulmont.testtask.dao.PatientController;
-import com.haulmont.testtask.dao.PrescriptionController;
+import com.haulmont.testtask.dao.DoctorDAO;
+import com.haulmont.testtask.dao.PatientDAO;
+import com.haulmont.testtask.dao.PrescriptionDAO;
+import com.haulmont.testtask.dao.PriorityDAO;
 import com.haulmont.testtask.model.Doctor;
 import com.haulmont.testtask.model.Patient;
 import com.haulmont.testtask.model.Prescription;
+import com.haulmont.testtask.model.Priority;
 import com.vaadin.data.Binder;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.*;
 
-import java.sql.SQLException;
-import java.util.List;
-
 public class PrescriptionsView extends BaseView<Prescription> {
 
-    public PrescriptionsView() throws SQLException {
-        setController(new PrescriptionController());
+    public PrescriptionsView() {
+        super(new PrescriptionDAO());
         setGrid(getPrescriptionsGrid());
         SingleSelect<Prescription> selection = getGrid().asSingleSelect();
         setSelection(selection);
-        setAddWindow("Добавить рецепт");
-        setEditWindow("Редактирование рецепта");
-        HorizontalLayout buttons = getButtons("500");
-        VerticalLayout buttonsAndGrid = getButtonsAndGrid();
-        buttonsAndGrid.addComponents(new Label("Список рецептов"), buttons, filter(), getGrid());
+        HorizontalLayout buttons = getButtons("Добавить рецепт", "Редактирование рецепта", "500");
+        VerticalLayout view = new VerticalLayout();
+        view.addComponents(new Label("Список рецептов"), buttons, filter(), getGrid());
+        setView(view);
     }
 
     @Override
-    protected FormLayout getAddEditForm(final boolean edit, final Window window) throws SQLException {
+    protected FormLayout getAddEditForm(final boolean edit, final Window window) {
 
         FormLayout addEditForm = new FormLayout();
         Binder<Prescription> binder = new Binder<>();
@@ -41,14 +39,14 @@ public class PrescriptionsView extends BaseView<Prescription> {
                 .bind(Prescription::getDescription, Prescription::setDescription);
 
         ComboBox<Patient> patient = new ComboBox<>("Пациент");
-        patient.setItems(new PatientController().getAll());
+        patient.setItems(new PatientDAO().getAll());
         patient.setWidth("350");
         binder.forField(patient)
                 .asRequired("Укажите пациента")
                 .bind(Prescription::getPatient, Prescription::setPatient);
 
         ComboBox<Doctor> doctor = new ComboBox<>("Врач");
-        doctor.setItems(new DoctorController().getAll());
+        doctor.setItems(new DoctorDAO().getAll());
         doctor.setWidth("350");
         binder.forField(doctor)
                 .asRequired("Укажите врача")
@@ -58,7 +56,7 @@ public class PrescriptionsView extends BaseView<Prescription> {
         created.setWidth("350");
         binder.forField(created)
                 .asRequired("Укажите дату создания")
-                .bind(Prescription::getCreated, Prescription::setCreated);
+                .bind(Prescription::getCreatedDate, Prescription::setCreatedDate);
 
         DateField validity = new DateField("Срок действия");
         validity.setWidth("350");
@@ -66,10 +64,9 @@ public class PrescriptionsView extends BaseView<Prescription> {
                 .asRequired("Укажите срок действия")
                 .bind(Prescription::getValidity, Prescription::setValidity);
 
-        ComboBox<String> priority = new ComboBox<>("Приоритет");
+        ComboBox<Priority> priority = new ComboBox<>("Приоритет");
         priority.setWidth("350");
-        List<String> prescriptionPrioritiesList = new Prescription().getListPriorities();
-        priority.setItems(prescriptionPrioritiesList);
+        priority.setItems(new PriorityDAO().getAll());
         binder.forField(priority)
                 .asRequired("Укажите приоритет")
                 .bind(Prescription::getPriority, Prescription::setPriority);
@@ -79,7 +76,7 @@ public class PrescriptionsView extends BaseView<Prescription> {
             description.setValue(selectedItem.getDescription());
             patient.setValue(selectedItem.getPatient());
             doctor.setValue(selectedItem.getDoctor());
-            created.setValue(selectedItem.getCreated());
+            created.setValue(selectedItem.getCreatedDate());
             validity.setValue(selectedItem.getValidity());
             priority.setValue(selectedItem.getPriority());
         }
@@ -97,23 +94,23 @@ public class PrescriptionsView extends BaseView<Prescription> {
 
     }
 
-    private Grid<Prescription> getPrescriptionsGrid() throws SQLException {
+    private Grid<Prescription> getPrescriptionsGrid() {
 
         Grid<Prescription> prescriptionsGrid = new Grid<>();
 
         prescriptionsGrid.addColumn(Prescription::getDescription).setCaption("Описание").setWidth(400);
         prescriptionsGrid.addColumn(Prescription::getPatient).setCaption("Пациент").setWidth(200);
         prescriptionsGrid.addColumn(Prescription::getDoctor).setCaption("Врач").setWidth(200);
-        prescriptionsGrid.addColumn(Prescription::getCreated).setCaption("Дата создания").setWidth(150);
+        prescriptionsGrid.addColumn(Prescription::getCreatedDate).setCaption("Дата создания").setWidth(150);
         prescriptionsGrid.addColumn(Prescription::getValidity).setCaption("Срок действия").setWidth(150);
         prescriptionsGrid.addColumn(Prescription::getPriority).setCaption("Приоритет").setWidth(150);
-        prescriptionsGrid.setItems(getController().getAll());
+        prescriptionsGrid.setItems(getDao().getAll());
         prescriptionsGrid.setWidth("1265");
 
         return prescriptionsGrid;
     }
 
-    private HorizontalLayout filter() throws SQLException {
+    private HorizontalLayout filter() {
 
         HorizontalLayout filter = new HorizontalLayout();
 
@@ -123,29 +120,31 @@ public class PrescriptionsView extends BaseView<Prescription> {
 
         ComboBox<Patient> patientFilter = new ComboBox<>();
         patientFilter.setWidth("300");
-        patientFilter.setItems(new PatientController().getAll());
+        patientFilter.setItems(new PatientDAO().getAll());
         patientFilter.setPlaceholder("Пациент");
         patientFilter.setEmptySelectionAllowed(true);
 
-        ComboBox<String> priorityFilter = new ComboBox<>();
+        ComboBox<Priority> priorityFilter = new ComboBox<>();
         priorityFilter.setWidth("200");
-        List<String> prescriptionPrioritiesList = new Prescription().getListPriorities();
-        priorityFilter.setItems(prescriptionPrioritiesList);
+        priorityFilter.setItems(new PriorityDAO().getAll());
         priorityFilter.setPlaceholder("Приоритет");
 
         Button apply = new Button("Применить");
         apply.setWidth("150");
         apply.addClickListener(event -> {
+
             String description = descriptionFilter.getValue();
+
             Patient patient = patientFilter.getValue();
             Long patientId = null;
             if (patient != null) patientId = patient.getId();
-            String priority = priorityFilter.getValue();
-            try {
-                getGrid().setItems(new PrescriptionController().getFilter(description, patientId, priority));
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+
+            Priority priority = priorityFilter.getValue();
+            Long priorityId = null;
+            if (priority != null) priorityId = priority.getId();
+
+            getGrid().setItems(new PrescriptionDAO().getFilter(description, patientId, priorityId));
+
         });
 
         filter.addComponents(descriptionFilter, patientFilter, priorityFilter, apply);

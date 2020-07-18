@@ -1,29 +1,27 @@
 package com.haulmont.testtask.view;
 
-import com.haulmont.testtask.dao.DoctorController;
-import com.haulmont.testtask.dao.PrescriptionController;
+import com.haulmont.testtask.dao.DoctorDAO;
+import com.haulmont.testtask.dao.PrescriptionDAO;
 import com.haulmont.testtask.model.Doctor;
 import com.haulmont.testtask.model.Prescription;
 import com.vaadin.data.Binder;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.*;
 
-import java.sql.SQLException;
 import java.util.*;
 
 public class DoctorsView extends BaseView<Doctor> {
 
-    public DoctorsView() throws SQLException {
-        setController(new DoctorController());
+    public DoctorsView() {
+        super(new DoctorDAO());
         setGrid(getDoctorsGrid());
         SingleSelect<Doctor> selection = getGrid().asSingleSelect();
         setSelection(selection);
-        setAddWindow("Добавить врача");
-        setEditWindow("Редактирование врача");
-        HorizontalLayout buttons = getButtons("400");
+        HorizontalLayout buttons = getButtons("Добавить врача", "Редактирование врача", "400");
         buttons.addComponent(statisticButton());
-        VerticalLayout buttonsAndGrid = getButtonsAndGrid();
-        buttonsAndGrid.addComponents(new Label("Список врачей"), buttons, getGrid());
+        VerticalLayout view = new VerticalLayout();
+        view.addComponents(new Label("Список врачей"), buttons, getGrid());
+        setView(view);
     }
 
     @Override
@@ -49,19 +47,19 @@ public class DoctorsView extends BaseView<Doctor> {
 
     }
 
-    private Grid<Doctor> getDoctorsGrid() throws SQLException {
+    private Grid<Doctor> getDoctorsGrid() {
 
         Grid<Doctor> doctorsGrid = PersonView.getPersonsGrid();
 
         doctorsGrid.addColumn(Doctor::getSpecialization).setCaption("Специализация").setWidth(200);
-        doctorsGrid.setItems(new DoctorController().getAll());
+        doctorsGrid.setItems(new DoctorDAO().getAll());
         doctorsGrid.setWidth("1115");
 
         return doctorsGrid;
 
     }
 
-    private Button statisticButton() throws SQLException {
+    private Button statisticButton() {
 
         Grid<Map.Entry<Doctor, Integer>> statisticGrid = new Grid<>();
         Set<Map.Entry<Doctor, Integer>> it = statisticMap().entrySet();
@@ -85,9 +83,9 @@ public class DoctorsView extends BaseView<Doctor> {
 
     }
 
-    private Map<Doctor, Integer> statisticMap() throws SQLException {
+    private Map<Doctor, Integer> statisticMap() {
 
-        List<Prescription> prescriptionsList = new PrescriptionController().getAll();
+        List<Prescription> prescriptionsList = new PrescriptionDAO().getAll();
 
         Map<Doctor, Integer> stat = new HashMap<>();
 

@@ -1,26 +1,23 @@
 package com.haulmont.testtask.view;
 
-import com.haulmont.testtask.dao.PatientController;
+import com.haulmont.testtask.dao.PatientDAO;
 import com.haulmont.testtask.model.Patient;
 import com.vaadin.data.Binder;
 import com.vaadin.data.validator.RegexpValidator;
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.ui.*;
 
-import java.sql.SQLException;
-
 public class PatientsView extends BaseView<Patient> {
 
-    public PatientsView() throws SQLException {
-        setController(new PatientController());
+    public PatientsView() {
+        super(new PatientDAO());
         setGrid(getPatientsGrid());
         SingleSelect<Patient> selection = getGrid().asSingleSelect();
         setSelection(selection);
-        setAddWindow("Добавить пациента");
-        setEditWindow("Редактирование пациента");
-        HorizontalLayout buttons = getButtons("400");
-        VerticalLayout buttonsAndGrid = getButtonsAndGrid();
-        buttonsAndGrid.addComponents(new Label("Список пациентов"), buttons, getGrid());
+        HorizontalLayout buttons = getButtons("Добавить пациента", "Редактирование пациента", "400");
+        VerticalLayout view = new VerticalLayout();
+        view.addComponents(new Label("Список пациентов"), buttons, getGrid());
+        setView(view);
     }
 
     @Override
@@ -49,12 +46,12 @@ public class PatientsView extends BaseView<Patient> {
 
     }
 
-    private Grid<Patient> getPatientsGrid() throws SQLException {
+    private Grid<Patient> getPatientsGrid() {
 
-        Grid<Patient> patientsGrid = PersonView.<Patient>getPersonsGrid();
+        Grid<Patient> patientsGrid = PersonView.getPersonsGrid();
 
         patientsGrid.addColumn(Patient::getPhone).setCaption("Телефон").setWidth(200);
-        patientsGrid.setItems(getController().getAll());
+        patientsGrid.setItems(getDao().getAll());
         patientsGrid.setWidth("1115");
 
         return patientsGrid;

@@ -4,8 +4,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Layout;
 
-import java.sql.SQLException;
-
 public class TopPanel {
 
     private Layout currentGrid;
@@ -16,7 +14,7 @@ public class TopPanel {
         this.parentLayout = parentLayout;
     }
 
-    public HorizontalLayout getTopButtons() throws SQLException {
+    public HorizontalLayout getTopButtons() {
 
         String buttonSize = "200";
 
@@ -26,17 +24,17 @@ public class TopPanel {
         Button buttonPatients = new Button("Пациенты");
         buttonPatients.setWidth(buttonSize);
         PatientsView patients = new PatientsView();
-        addButtonClickListener(buttonPatients, parentLayout, patients.getButtonsAndGrid());
+        addButtonClickListener(buttonPatients, parentLayout, patients.getView());
 
         Button buttonDoctors = new Button("Врачи");
         buttonDoctors.setWidth(buttonSize);
         DoctorsView doctors = new DoctorsView();
-        addButtonClickListener(buttonDoctors, parentLayout, doctors.getButtonsAndGrid());
+        addButtonClickListener(buttonDoctors, parentLayout, doctors.getView());
 
         Button buttonPrescriptions = new Button("Рецепты");
         buttonPrescriptions.setWidth(buttonSize);
         PrescriptionsView prescriptions = new PrescriptionsView();
-        addButtonClickListener(buttonPrescriptions, parentLayout, prescriptions.getButtonsAndGrid());
+        addButtonClickListener(buttonPrescriptions, parentLayout, prescriptions.getView());
 
         topButtons.addComponents(buttonPatients, buttonDoctors, buttonPrescriptions);
 
