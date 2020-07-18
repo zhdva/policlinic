@@ -1,17 +1,37 @@
 package com.haulmont.testtask.model;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Objects;
 
+@Entity
+@Table(name = "prescriptions")
 public class Prescription {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "description", nullable=false)
     private String description;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "patient_id", nullable=false)
     private Patient patient;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "doctor_id", nullable=false)
     private Doctor doctor;
-    private LocalDate created;
+
+    @Column(name = "created", nullable=false)
+    private LocalDate createdDate;
+
+    @Column(name = "validity", nullable=false)
     private LocalDate validity;
-    private String priority;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "priority_id", nullable=false)
+    private Priority priority;
 
     public Long getId() {
         return id;
@@ -29,19 +49,19 @@ public class Prescription {
         return doctor;
     }
 
-    public LocalDate getCreated() {
-        return created;
+    public LocalDate getCreatedDate() {
+        return createdDate;
     }
 
     public LocalDate getValidity() {
         return validity;
     }
 
-    public String getPriority() {
+    public Priority getPriority() {
         return priority;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -57,24 +77,34 @@ public class Prescription {
         this.doctor = doctor;
     }
 
-    public void setCreated(final LocalDate created) {
-        this.created = created;
+    public void setCreatedDate(final LocalDate createdDate) {
+        this.createdDate = createdDate;
     }
 
     public void setValidity(final LocalDate validity) {
         this.validity = validity;
     }
 
-    public void setPriority(final String priority) {
+    public void setPriority(final Priority priority) {
         this.priority = priority;
     }
 
-    public List<String> getListPriorities() {
-        List<String> priorities = new ArrayList<>();
-        priorities.add("Нормальный");
-        priorities.add("Срочный");
-        priorities.add("Немедленный");
-        return priorities;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Prescription that = (Prescription) o;
+        return description.equals(that.description) &&
+                patient.equals(that.patient) &&
+                doctor.equals(that.doctor) &&
+                createdDate.equals(that.createdDate) &&
+                validity.equals(that.validity) &&
+                priority.equals(that.priority);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, patient, doctor, createdDate, validity, priority);
     }
 
 }
