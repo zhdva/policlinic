@@ -29,7 +29,7 @@ public class PersonView {
         middleName.setWidth("250");
         middleName.setMaxLength(50);
         binder.forField(middleName)
-                .withValidator(new StringLengthValidator("Укажите отчество", 1, null))
+                //.withValidator(new StringLengthValidator("Укажите отчество", 1, null))
                 .bind(T::getMiddleName, T::setMiddleName);
 
         if (selectedItem != null && edit) {
