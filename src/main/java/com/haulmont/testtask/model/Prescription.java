@@ -15,11 +15,11 @@ public class Prescription {
     @Column(name = "description", nullable=false)
     private String description;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "patient_id", nullable=false)
     private Patient patient;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "doctor_id", nullable=false)
     private Doctor doctor;
 
@@ -29,7 +29,7 @@ public class Prescription {
     @Column(name = "validity", nullable=false)
     private LocalDate validity;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "priority_id", nullable=false)
     private Priority priority;
 
